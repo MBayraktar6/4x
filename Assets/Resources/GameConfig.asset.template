@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG ! tag:yaml.org,2002:map
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - component: {fileID: 0}
+  m_Layer: 0
+  m_Name: GameConfig
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+GameConfig:
+  mapWidth: 100
+  mapHeight: 100
+  tileSize: 32
+  startingGold: 1000
+  startingWood: 500
+  startingFood: 750
+  buildingConstructionSpeed: 1
+  unitTrainingSpeed: 2
+  combatDamageMultiplier: 1
+  maxClanMembers: 100
+  clanTerritorySize: 10
+  videoAdCooldownMinutes: 15
+  dailyVideoAdLimit: 48
+  goldRewardPerVideo: 100
+  woodRewardPerVideo: 50
+  foodRewardPerVideo: 75
+  use3DEffects: 1
+  particleEffectIntensity: 1
