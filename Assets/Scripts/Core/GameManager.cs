@@ -5,13 +5,24 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
-    [SerializeField] private GameConfig gameConfig;
-    private PlayerData playerData;
-    private MapManager mapManager;
-    private VillageManager villageManager;
-    private ClanManager clanManager;
-    private AdManager adManager;
-    private UIManager uiManager;
+    [Header("Game State")]
+    public GameState currentGameState;
+    public float gameSpeed = 1f;
+    private float gameTimer = 0f;
+
+    [Header("Player Data")]
+    public PlayerData playerData;
+    public ClanManager clanManager;
+    public EconomyManager economyManager;
+    public MapManager mapManager;
+    public BuildingManager buildingManager;
+    public UnitManager unitManager;
+    public UIManager uiManager;
+    public AdsManager adsManager;
+
+    [Header("Settings")]
+    public bool isPaused = false;
+    public bool isOfflineMode = false;
 
     private void Awake()
     {
@@ -32,41 +43,76 @@ public class GameManager : MonoBehaviour
 
     private void InitializeGame()
     {
-        Debug.Log("[GameManager] Oyun başlatılıyor...");
-
-        // Oyuncu verisini yükle
-        playerData = SaveManager.LoadPlayerData();
-        if (playerData == null)
-        {
-            playerData = new PlayerData();
-            playerData.Initialize();
-        }
-
-        // Yöneticileri başlat
-        mapManager = GetComponent<MapManager>();
-        villageManager = GetComponent<VillageManager>();
+        // Initialize all managers
+        playerData = GetComponent<PlayerData>();
         clanManager = GetComponent<ClanManager>();
-        adManager = GetComponent<AdManager>();
+        economyManager = GetComponent<EconomyManager>();
+        mapManager = GetComponent<MapManager>();
+        buildingManager = GetComponent<BuildingManager>();
+        unitManager = GetComponent<UnitManager>();
         uiManager = GetComponent<UIManager>();
+        adsManager = GetComponent<AdsManager>();
 
-        if (mapManager != null) mapManager.Initialize(gameConfig);
-        if (villageManager != null) villageManager.Initialize(playerData);
-        if (clanManager != null) clanManager.Initialize(playerData);
-        if (adManager != null) adManager.Initialize();
-        if (uiManager != null) uiManager.Initialize();
+        // Load saved data
+        LoadGameData();
 
-        Debug.Log("[GameManager] Oyun hazır!");
+        // Set initial state
+        currentGameState = GameState.Playing;
     }
 
-    public void SaveGame()
+    private void Update()
     {
-        SaveManager.SavePlayerData(playerData);
-        Debug.Log("[GameManager] Oyun kaydedildi.");
+        if (isPaused)
+            return;
+
+        gameTimer += Time.deltaTime * gameSpeed;
+
+        // Update all systems
+        economyManager.UpdateEconomy(Time.deltaTime);
+        buildingManager.UpdateBuildings(Time.deltaTime);
+        unitManager.UpdateUnits(Time.deltaTime);
+        clanManager.UpdateClan(Time.deltaTime);
     }
 
-    public PlayerData GetPlayerData() => playerData;
-    public MapManager GetMapManager() => mapManager;
-    public VillageManager GetVillageManager() => villageManager;
-    public ClanManager GetClanManager() => clanManager;
-    public AdManager GetAdManager() => adManager;
+    public void PauseGame()
+    {
+        isPaused = true;
+        currentGameState = GameState.Paused;
+    }
+
+    public void ResumeGame()
+    {
+        isPaused = false;
+        currentGameState = GameState.Playing;
+    }
+
+    public void SaveGameData()
+    {
+        playerData.SaveData();
+        clanManager.SaveClanData();
+        mapManager.SaveMapData();
+        economyManager.SaveEconomyData();
+    }
+
+    public void LoadGameData()
+    {
+        playerData.LoadData();
+        clanManager.LoadClanData();
+        mapManager.LoadMapData();
+        economyManager.LoadEconomyData();
+    }
+
+    private void OnApplicationQuit()
+    {
+        SaveGameData();
+    }
+
+    public enum GameState
+    {
+        Playing,
+        Paused,
+        Building,
+        Combat,
+        MenuScreen
+    }
 }
