@@ -3,141 +3,116 @@ using System.Collections.Generic;
 
 public class MapManager : MonoBehaviour
 {
-    private GameConfig config;
-    private Tile[,] tiles;
-    private List<Territory> territories = new List<Territory>();
-
     [System.Serializable]
     public class Tile
     {
-        public int x;
-        public int y;
-        public TerrainType terrainType;
-        public int territoryId = -1; // Hangi bölgeye ait
-        public int ownerId = -1; // Oyuncu ID
+        public Vector2Int position;
+        public TileType tileType;
+        public int clanId = -1; // -1 means neutral
+        public Building building;
+        public List<Unit> units = new List<Unit>();
     }
 
-    [System.Serializable]
-    public class Territory
+    public enum TileType
     {
-        public int territoryId;
-        public int centerX;
-        public int centerY;
-        public int size; // Kaç tile
-        public int controllingPlayerId = -1;
-        public List<Tile> tiles = new List<Tile>();
+        Grass,
+        Forest,
+        Mountain,
+        Water,
+        Desert
     }
 
-    public void Initialize(GameConfig gameConfig)
-    {
-        config = gameConfig;
-        GenerateMap();
-        GenerateTerritories();
-        Debug.Log($"[MapManager] Harita oluşturuldu: {config.mapWidth}x{config.mapHeight}");
-    }
+    [Header("Map Settings")]
+    public int mapWidth = 100;
+    public int mapHeight = 100;
+    public float tileSize = 1f;
 
-    private void GenerateMap()
-    {
-        tiles = new Tile[config.mapWidth, config.mapHeight];
+    private Tile[,] mapGrid;
+    private Dictionary<Vector2Int, GameObject> tileGameObjects = new Dictionary<Vector2Int, GameObject>();
 
-        for (int x = 0; x < config.mapWidth; x++)
+    public void InitializeMap()
+    {
+        mapGrid = new Tile[mapWidth, mapHeight];
+
+        for (int x = 0; x < mapWidth; x++)
         {
-            for (int y = 0; y < config.mapHeight; y++)
+            for (int y = 0; y < mapHeight; y++)
             {
-                tiles[x, y] = new Tile
+                mapGrid[x, y] = new Tile
                 {
-                    x = x,
-                    y = y,
-                    terrainType = RandomTerrainType()
+                    position = new Vector2Int(x, y),
+                    tileType = GenerateRandomTile(),
+                    clanId = -1
                 };
             }
         }
+
+        Debug.Log("Map initialized: " + mapWidth + " x " + mapHeight);
     }
 
-    private void GenerateTerritories()
+    private TileType GenerateRandomTile()
     {
-        int territorySize = 10; // 10x10 bölgeler
-        int id = 0;
+        float random = Random.value;
+        if (random < 0.5f) return TileType.Grass;
+        else if (random < 0.7f) return TileType.Forest;
+        else if (random < 0.85f) return TileType.Mountain;
+        else if (random < 0.95f) return TileType.Water;
+        else return TileType.Desert;
+    }
 
-        for (int x = 0; x < config.mapWidth; x += territorySize)
+    public Tile GetTile(Vector2Int position)
+    {
+        if (IsValidPosition(position))
         {
-            for (int y = 0; y < config.mapHeight; y += territorySize)
-            {
-                Territory territory = new Territory
-                {
-                    territoryId = id++,
-                    centerX = x + territorySize / 2,
-                    centerY = y + territorySize / 2,
-                    size = territorySize
-                };
-
-                // Bölgeyi tile'larla doldur
-                for (int tx = x; tx < x + territorySize && tx < config.mapWidth; tx++)
-                {
-                    for (int ty = y; ty < y + territorySize && ty < config.mapHeight; ty++)
-                    {
-                        tiles[tx, ty].territoryId = territory.territoryId;
-                        territory.tiles.Add(tiles[tx, ty]);
-                    }
-                }
-
-                territories.Add(territory);
-            }
+            return mapGrid[position.x, position.y];
         }
-    }
-
-    private TerrainType RandomTerrainType()
-    {
-        float rand = Random.value;
-        if (rand < 0.5f) return TerrainType.Grass;
-        if (rand < 0.7f) return TerrainType.Forest;
-        if (rand < 0.85f) return TerrainType.Mountain;
-        return TerrainType.Water;
-    }
-
-    public Tile GetTile(int x, int y)
-    {
-        if (x >= 0 && x < config.mapWidth && y >= 0 && y < config.mapHeight)
-            return tiles[x, y];
         return null;
     }
 
-    public Territory GetTerritory(int territoryId)
+    public bool IsValidPosition(Vector2Int position)
     {
-        if (territoryId >= 0 && territoryId < territories.Count)
-            return territories[territoryId];
-        return null;
+        return position.x >= 0 && position.x < mapWidth && position.y >= 0 && position.y < mapHeight;
     }
 
-    public List<Territory> GetAllTerritories() => new List<Territory>(territories);
-
-    public bool ClaimTerritory(int playerId, int territoryId)
+    public bool CanPlaceBuilding(Vector2Int position)
     {
-        var territory = GetTerritory(territoryId);
-        if (territory == null)
-            return false;
-
-        if (territory.controllingPlayerId != -1)
-        {
-            Debug.LogWarning("[MapManager] Bu bölge zaten kontrol ediliyor!");
-            return false;
-        }
-
-        territory.controllingPlayerId = playerId;
-        foreach (var tile in territory.tiles)
-        {
-            tile.ownerId = playerId;
-        }
-
-        Debug.Log($"[MapManager] Oyuncu {playerId} bölge {territoryId} ele geçirdi.");
+        Tile tile = GetTile(position);
+        if (tile == null) return false;
+        if (tile.building != null) return false;
+        if (tile.tileType == TileType.Water) return false;
         return true;
     }
-}
 
-public enum TerrainType
-{
-    Grass,
-    Forest,
-    Mountain,
-    Water
+    public void ClaimTile(Vector2Int position, int clanId)
+    {
+        Tile tile = GetTile(position);
+        if (tile != null)
+        {
+            tile.clanId = clanId;
+        }
+    }
+
+    public List<Tile> GetClanTerritories(int clanId)
+    {
+        List<Tile> territories = new List<Tile>();
+        for (int x = 0; x < mapWidth; x++)
+        {
+            for (int y = 0; y < mapHeight; y++)
+            {
+                if (mapGrid[x, y].clanId == clanId)
+                    territories.Add(mapGrid[x, y]);
+            }
+        }
+        return territories;
+    }
+
+    public void SaveMapData()
+    {
+        // Implement save logic
+    }
+
+    public void LoadMapData()
+    {
+        // Implement load logic
+    }
 }

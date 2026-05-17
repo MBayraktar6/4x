@@ -1,127 +1,145 @@
 using UnityEngine;
-using System.Collections.Generic;
+using System;
 
 [System.Serializable]
-public class PlayerData
+public class PlayerData : MonoBehaviour
 {
-    public string playerId;
-    public string playerName;
-    public int level;
-    public long totalExperience;
+    [System.Serializable]
+    public class PlayerInfo
+    {
+        public string playerName;
+        public int level = 1;
+        public long experience = 0;
+        public int clanId = -1;
+        public Vector3 villagePosition = Vector3.zero;
+    }
 
     [System.Serializable]
     public class Resources
     {
-        public long gold;
-        public long wood;
-        public long food;
-        public long gems; // Premium para birimi
+        public long gold = 50000;
+        public long wood = 50000;
+        public long stone = 50000;
+        public long food = 50000;
+        public long iron = 10000;
     }
 
+    public PlayerInfo playerInfo = new PlayerInfo();
     public Resources resources = new Resources();
+    public long totalGamesPlayed = 0;
+    public long lastSaveTime = 0;
 
-    [System.Serializable]
-    public class AdStats
+    private const string PLAYER_PREFS_KEY = "PlayerData_";
+
+    public void SaveData()
     {
-        public long lastAdWatchTime; // Unix timestamp
-        public int adWatchCountToday;
-        public long dailyAdResetTime; // Unix timestamp
+        lastSaveTime = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        string json = JsonUtility.ToJson(this, true);
+        PlayerPrefs.SetString(PLAYER_PREFS_KEY + playerInfo.playerName, json);
+        PlayerPrefs.Save();
+        Debug.Log("Game saved: " + playerInfo.playerName);
     }
 
-    public AdStats adStats = new AdStats();
-
-    public List<VillageData> villages = new List<VillageData>();
-    public ClanData clan;
-    public List<int> ownedTerritories = new List<int>(); // Territory IDs
-
-    public void Initialize()
+    public void LoadData()
     {
-        playerId = System.Guid.NewGuid().ToString();
-        playerName = "Oyuncu_" + Random.Range(1000, 9999);
-        level = 1;
-        totalExperience = 0;
+        if (string.IsNullOrEmpty(playerInfo.playerName))
+            playerInfo.playerName = "Player_" + UnityEngine.Random.Range(1000, 9999);
 
-        resources.gold = 1000;
-        resources.wood = 500;
-        resources.food = 750;
-        resources.gems = 0;
-
-        adStats.lastAdWatchTime = 0;
-        adStats.adWatchCountToday = 0;
-        adStats.dailyAdResetTime = GetCurrentUnixTime() + (24 * 3600);
-
-        // İlk köyü oluştur
-        VillageData firstVillage = new VillageData();
-        firstVillage.Initialize("Ana Köy", 0, 50, 50);
-        villages.Add(firstVillage);
-    }
-
-    public long GetCurrentUnixTime()
-    {
-        return System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-    }
-
-    public bool AddResource(ResourceType type, long amount)
-    {
-        switch (type)
+        string key = PLAYER_PREFS_KEY + playerInfo.playerName;
+        if (PlayerPrefs.HasKey(key))
         {
-            case ResourceType.Gold:
-                resources.gold += amount;
-                return true;
-            case ResourceType.Wood:
-                resources.wood += amount;
-                return true;
-            case ResourceType.Food:
-                resources.food += amount;
-                return true;
-            case ResourceType.Gems:
-                resources.gems += amount;
-                return true;
+            string json = PlayerPrefs.GetString(key);
+            JsonUtility.FromJsonOverwrite(json, this);
+            Debug.Log("Game loaded: " + playerInfo.playerName);
         }
-        return false;
+        else
+        {
+            Debug.Log("New game started");
+        }
     }
 
-    public bool RemoveResource(ResourceType type, long amount)
+    public bool AddResources(string resourceType, long amount)
     {
-        switch (type)
+        switch (resourceType.ToLower())
         {
-            case ResourceType.Gold:
+            case "gold":
+                resources.gold += amount;
+                break;
+            case "wood":
+                resources.wood += amount;
+                break;
+            case "stone":
+                resources.stone += amount;
+                break;
+            case "food":
+                resources.food += amount;
+                break;
+            case "iron":
+                resources.iron += amount;
+                break;
+            default:
+                return false;
+        }
+        return true;
+    }
+
+    public bool RemoveResources(string resourceType, long amount)
+    {
+        switch (resourceType.ToLower())
+        {
+            case "gold":
                 if (resources.gold >= amount)
                 {
                     resources.gold -= amount;
                     return true;
                 }
                 break;
-            case ResourceType.Wood:
+            case "wood":
                 if (resources.wood >= amount)
                 {
                     resources.wood -= amount;
                     return true;
                 }
                 break;
-            case ResourceType.Food:
+            case "stone":
+                if (resources.stone >= amount)
+                {
+                    resources.stone -= amount;
+                    return true;
+                }
+                break;
+            case "food":
                 if (resources.food >= amount)
                 {
                     resources.food -= amount;
                     return true;
                 }
                 break;
-            case ResourceType.Gems:
-                if (resources.gems >= amount)
+            case "iron":
+                if (resources.iron >= amount)
                 {
-                    resources.gems -= amount;
+                    resources.iron -= amount;
                     return true;
                 }
                 break;
         }
         return false;
     }
-}
 
-public enum ResourceType
-{
-    Gold,
-    Wood,
-    Food,
-    Gems
+    public void AddExperience(long amount)
+    {
+        experience += amount;
+        CheckLevelUp();
+    }
+
+    private void CheckLevelUp()
+    {
+        long requiredExp = playerInfo.level * 1000;
+        if (playerInfo.experience >= requiredExp)
+        {
+            playerInfo.level++;
+            playerInfo.experience -= requiredExp;
+            Debug.Log("Level Up! New Level: " + playerInfo.level);
+        }
+    }
 }

@@ -1,40 +1,52 @@
-# Wolf Game 4X Mobile
+# 4X Strategy Mobile Game - Wolf Game Style
 
-Bir stratejik 4X mobil oyunu. Köy geliştir, klanlar kur, büyük haritada bölge kapla!
+## Oyun Özellikleri
 
-## Özellikler
-- 🏘️ Köy İnşa Sistemi
-- 🐺 Klan Sistemi
-- 🗺️ Büyük Dünya Haritası
-- ⚔️ Real-time Strateji ve Savaş
-- 📱 Android & iOS Desteği
-- 🎬 AdMob Video Reklam İntegrasyonu
-- 💰 Ödül Sistemi
+- **Oyun Türü**: 4X Stratejik Oyun (Wolf Game Benzeri)
+- **Platform**: Android & iOS
+- **Motor**: Unity
+- **Grafik**: 2D Ağırlıklı + 3D Efektler
+- **Para Modeli**: Ücretsiz + Opsiyonel Video Reklam Ödülü
 
-## Kurulum
-1. Unity 2022 LTS+ yükleyin
-2. Repository'yi klonlayın
-3. `/Assets` klasörü Unity'de açılacak
-4. Play tuşuna basıp oyunu test edin
+## Temel Mekanikler
+
+1. **Köy Geliştirme**: Bina inşaatı, kaynaklar, ürün
+2. **Klan Sistemi**: Oyuncuların klan oluşturması ve yönetimi
+3. **Harita Kontrolü**: Büyük harita üzerinde klan ile yer kapma
+4. **Real-time Sistemi**: Gerçek zamanlı inşaat ve asker eğitimi
+5. **Video Ödül Sistemi**: 15/30 dakika aralığında video izleyerek ufak ödüller kazanma
+6. **AdMob Entegrasyonu**: Reklam gösterimi ve gelir
 
 ## Proje Yapısı
+
 ```
 Assets/
 ├── Scripts/
 │   ├── Core/
-│   ├── Game/
-│   ├── UI/
+│   ├── Buildings/
+│   ├── Units/
 │   ├── Map/
-│   ├── Village/
 │   ├── Clan/
+│   ├── UI/
+│   ├── Economy/
 │   ├── Ads/
 │   └── Managers/
-├── Resources/
-├── Scenes/
 ├── Prefabs/
+├── Scenes/
+├── Resources/
 ├── Sprites/
-└── Audio/
+├── Animations/
+├── Audio/
+└── Plugins/
 ```
 
-## Lisans
-MIT License
+## Kurulum
+
+1. Unity 2022.3+ açın
+2. Project'i açın
+3. Scenes/MainScene.unity dosyasını yükleyin
+4. Play düğmesine basın
+
+## Geliştiriciler
+
+MBayraktar6

@@ -1,19 +1,30 @@
 # Unity
-/[Ll]ibrary/
-/[Tt]emp/
-/[Oo]bj/
-/[Bb]uild/
-/[Bb]uilds/
-/[Ll]ogs/
-/[Uu]ser[Ss]ettings/
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+UserSettings/
 *.csproj
 *.sln
+*.unityproj
+*.suo
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.xcodeproj/
+*.xcworkspace/
 .DS_Store
-*.unitypackage
-Assets/AssetStoreTools*
+Thumbs.db
 *.apk
 *.aab
 *.ipa
+*.unitypackage
 
 # IDE
 .vscode/
@@ -26,7 +37,17 @@ Assets/AssetStoreTools*
 .c9/
 *.launch
 .settings/
+*.sublime-workspace
 
-# Local
+# OS
+.DS_Store
+Thumbs.db
+.directory
+
+# Node
+node_modules/
+npm-debug.log
+
+# Environment
 .env
-*.log
+.env.local

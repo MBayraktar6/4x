@@ -1,0 +1,156 @@
+{
+  "buildings": [
+    {
+      "buildingType": "TownHall",
+      "buildingName": "Town Hall",
+      "buildTime": 120,
+      "buildCost": {
+        "gold": 1000,
+        "wood": 500,
+        "stone": 500,
+        "food": 100,
+        "iron": 50
+      },
+      "productionPerHour": {
+        "gold": 100,
+        "wood": 0,
+        "stone": 0,
+        "food": 0,
+        "iron": 0
+      }
+    },
+    {
+      "buildingType": "Barracks",
+      "buildingName": "Barracks",
+      "buildTime": 100,
+      "buildCost": {
+        "gold": 800,
+        "wood": 400,
+        "stone": 300,
+        "food": 50,
+        "iron": 100
+      },
+      "productionPerHour": {
+        "gold": 0,
+        "wood": 0,
+        "stone": 0,
+        "food": 0,
+        "iron": 0
+      }
+    },
+    {
+      "buildingType": "Farm",
+      "buildingName": "Farm",
+      "buildTime": 60,
+      "buildCost": {
+        "gold": 300,
+        "wood": 200,
+        "stone": 100,
+        "food": 10,
+        "iron": 0
+      },
+      "productionPerHour": {
+        "gold": 0,
+        "wood": 0,
+        "stone": 0,
+        "food": 500,
+        "iron": 0
+      }
+    },
+    {
+      "buildingType": "Lumbermill",
+      "buildingName": "Lumber Mill",
+      "buildTime": 80,
+      "buildCost": {
+        "gold": 400,
+        "wood": 100,
+        "stone": 200,
+        "food": 30,
+        "iron": 20
+      },
+      "productionPerHour": {
+        "gold": 0,
+        "wood": 600,
+        "stone": 0,
+        "food": 0,
+        "iron": 0
+      }
+    },
+    {
+      "buildingType": "StoneMine",
+      "buildingName": "Stone Mine",
+      "buildTime": 90,
+      "buildCost": {
+        "gold": 450,
+        "wood": 200,
+        "stone": 100,
+        "food": 40,
+        "iron": 30
+      },
+      "productionPerHour": {
+        "gold": 0,
+        "wood": 0,
+        "stone": 550,
+        "food": 0,
+        "iron": 0
+      }
+    },
+    {
+      "buildingType": "IronMine",
+      "buildingName": "Iron Mine",
+      "buildTime": 110,
+      "buildCost": {
+        "gold": 600,
+        "wood": 300,
+        "stone": 300,
+        "food": 50,
+        "iron": 10
+      },
+      "productionPerHour": {
+        "gold": 0,
+        "wood": 0,
+        "stone": 0,
+        "food": 0,
+        "iron": 300
+      }
+    },
+    {
+      "buildingType": "Wall",
+      "buildingName": "Wall",
+      "buildTime": 70,
+      "buildCost": {
+        "gold": 500,
+        "wood": 300,
+        "stone": 400,
+        "food": 0,
+        "iron": 50
+      },
+      "productionPerHour": {
+        "gold": 0,
+        "wood": 0,
+        "stone": 0,
+        "food": 0,
+        "iron": 0
+      }
+    },
+    {
+      "buildingType": "Tower",
+      "buildingName": "Defense Tower",
+      "buildTime": 100,
+      "buildCost": {
+        "gold": 700,
+        "wood": 250,
+        "stone": 350,
+        "food": 25,
+        "iron": 100
+      },
+      "productionPerHour": {
+        "gold": 0,
+        "wood": 0,
+        "stone": 0,
+        "food": 0,
+        "iron": 0
+      }
+    }
+  ]
+}

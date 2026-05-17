@@ -3,85 +3,97 @@ using System.Collections.Generic;
 
 public class ClanManager : MonoBehaviour
 {
-    private PlayerData playerData;
-    private List<ClanData> allClans = new List<ClanData>();
-
-    public void Initialize(PlayerData data)
+    [System.Serializable]
+    public class Clan
     {
-        playerData = data;
-        Debug.Log("[ClanManager] Klan sistemi başlatıldı.");
+        public int clanId;
+        public string clanName;
+        public int leaderId;
+        public List<int> memberIds = new List<int>();
+        public long clanGold = 0;
+        public int level = 1;
+        public long experience = 0;
+        public Vector3 clanHallPosition;
+        public List<Vector2Int> ownedTerritories = new List<Vector2Int>();
     }
 
-    public bool CreateClan(string clanName, string description)
+    public Clan playerClan;
+    public Dictionary<int, Clan> allClans = new Dictionary<int, Clan>();
+    private int nextClanId = 1;
+
+    public Clan CreateClan(string clanName, int leaderId)
     {
-        if (playerData.clan != null)
+        Clan newClan = new Clan
         {
-            Debug.LogWarning("[ClanManager] Zaten bir klana üyesiniz!");
-            return false;
-        }
+            clanId = nextClanId++,
+            clanName = clanName,
+            leaderId = leaderId,
+            level = 1,
+            experience = 0,
+            clanGold = 10000
+        };
 
-        ClanData newClan = new ClanData();
-        newClan.Initialize(clanName, playerData.playerId, description);
-        playerData.clan = newClan;
-        allClans.Add(newClan);
+        newClan.memberIds.Add(leaderId);
+        allClans.Add(newClan.clanId, newClan);
+        playerClan = newClan;
 
-        Debug.Log($"[ClanManager] Yeni klan oluşturuldu: {clanName}");
-        return true;
+        GameManager.Instance.playerData.playerInfo.clanId = newClan.clanId;
+
+        Debug.Log("Clan created: " + clanName);
+        return newClan;
     }
 
-    public bool JoinClan(int clanId)
+    public void JoinClan(int playerId, int clanId)
     {
-        var clan = allClans.Find(c => c.clanId == clanId);
-        if (clan == null)
-            return false;
-
-        if (playerData.clan != null)
+        if (allClans.ContainsKey(clanId))
         {
-            Debug.LogWarning("[ClanManager] Zaten bir klana üyesiniz!");
-            return false;
+            allClans[clanId].memberIds.Add(playerId);
+            Debug.Log("Player " + playerId + " joined clan " + clanId);
         }
-
-        if (clan.members.Count >= clan.maxMembers)
-        {
-            Debug.LogWarning("[ClanManager] Klan dolu!");
-            return false;
-        }
-
-        clan.AddMember(playerData.playerId);
-        playerData.clan = clan;
-
-        Debug.Log($"[ClanManager] {playerData.playerName} klana katıldı: {clan.clanName}");
-        return true;
     }
 
-    public bool ClaimTerritory(int territoryId)
+    public void LeaveClan(int playerId, int clanId)
     {
-        if (playerData.clan == null)
+        if (allClans.ContainsKey(clanId))
         {
-            Debug.LogWarning("[ClanManager] Bölge hakkı talep etmek için klana ait olmalısınız!");
-            return false;
+            allClans[clanId].memberIds.Remove(playerId);
+            Debug.Log("Player " + playerId + " left clan " + clanId);
         }
-
-        if (playerData.ownedTerritories.Contains(territoryId))
-        {
-            Debug.LogWarning("[ClanManager] Bu bölge zaten sahip olunuyor!");
-            return false;
-        }
-
-        playerData.ownedTerritories.Add(territoryId);
-        playerData.clan.ownedTerritories.Add(territoryId);
-
-        Debug.Log($"[ClanManager] Bölge ele geçirildi: {territoryId}");
-        return true;
     }
 
-    public ClanData GetClan(int clanId)
+    public void AddClanExperience(int clanId, long amount)
     {
-        return allClans.Find(c => c.clanId == clanId);
+        if (allClans.ContainsKey(clanId))
+        {
+            Clan clan = allClans[clanId];
+            clan.experience += amount;
+            CheckClanLevelUp(clan);
+        }
     }
 
-    public List<ClanData> GetAllClans()
+    private void CheckClanLevelUp(Clan clan)
     {
-        return new List<ClanData>(allClans);
+        long requiredExp = clan.level * 10000;
+        if (clan.experience >= requiredExp)
+        {
+            clan.level++;
+            clan.experience -= requiredExp;
+            Debug.Log("Clan " + clan.clanName + " leveled up! New level: " + clan.level);
+        }
+    }
+
+    public void UpdateClan(float deltaTime)
+    {
+        // Clan updates
+    }
+
+    public void SaveClanData()
+    {
+        // Implement save logic
+    }
+
+    public void LoadClanData()
+    {
+        // Implement load logic
     }
 }
