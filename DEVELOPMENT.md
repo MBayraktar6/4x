@@ -31,7 +31,7 @@
 Assets/
 ├── Scripts/
 │   ├── Core/              # Core game systems
-│   │   ├���─ GameManager.cs
+│   │   ├── GameManager.cs
 │   │   └── PlayerData.cs
 │   ├── Buildings/         # Building system
 │   │   ├── Building.cs
