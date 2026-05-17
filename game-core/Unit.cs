@@ -5,25 +5,27 @@ public abstract class Unit
     public int Y { get; set; }
     public float Health { get; set; }
     public float MaxHealth { get; set; }
-    public float Energy { get; set; }
-    public float MaxEnergy { get; set; }
+    public float Divine { get; set; }
+    public float MaxDivine { get; set; }
     public int Age { get; set; }
+    public UnitType Type { get; set; }
 
-    protected Unit(int x, int y, float maxHealth, float maxEnergy)
+    protected Unit(int x, int y, float maxHealth, float maxDivine, UnitType type)
     {
         X = x;
         Y = y;
         MaxHealth = maxHealth;
         Health = maxHealth;
-        MaxEnergy = maxEnergy;
-        Energy = maxEnergy;
+        MaxDivine = maxDivine;
+        Divine = maxDivine;
         Age = 0;
+        Type = type;
     }
 
     public virtual void Update()
     {
         Age++;
-        Energy = Mathf.Max(0, Energy - 0.5f);
+        Divine = Mathf.Max(0, Divine - 0.3f);
         Health = Mathf.Max(0, Health - 0.1f);
     }
 
@@ -33,4 +35,11 @@ public abstract class Unit
     }
 
     public bool IsAlive => Health > 0;
+}
+
+public enum UnitType
+{
+    Immortal,  // Tanrılar
+    Hero,      // İnsan Kahramanlar
+    Mortal     // Sıradan İnsanlar
 }
